@@ -3,6 +3,7 @@ import Cards from "../../components/cardList";
 
 export default function Home() {
   return (
+    
     <div >
 
 

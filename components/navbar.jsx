@@ -10,6 +10,7 @@ export default function Navbar() {
   const [sortOrder, setSortOrder] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null); // Track authenticated user
+  const [isMounted, setIsMounted] = useState(false); // Track if component has mounted
 
   const router = useRouter();
   const pathname = usePathname();
@@ -17,6 +18,9 @@ export default function Navbar() {
   const currentCategory = searchParams.get("category") || "";
 
   useEffect(() => {
+    // Indicate that the component has mounted to ensure client-side rendering
+    setIsMounted(true);
+
     // Use the imported auth instance
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -29,6 +33,7 @@ export default function Navbar() {
     // Clean up subscription on component unmount
     return () => unsubscribe();
   }, []);
+
   const handleClear = () => {
     router.push(`/`);
     setSearchTerm("");
@@ -59,6 +64,11 @@ export default function Navbar() {
       console.error("Error signing out:", error);
     }
   };
+
+  // Prevent server-side rendering issues by delaying rendering dependent on user state
+  if (!isMounted) {
+    return null; // Don't render anything on the server
+  }
 
   return (
     <div className="w-full">
@@ -154,471 +164,472 @@ export default function Navbar() {
         <hr className="border-gray-700" />
         <div className="hidden lg:flex justify-center space-x-8 py-2">
        
-          <div className="relative group">
-            <button
-              className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-10 text-sm font-medium focus:outline-none"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Sort By
-              <svg
-                className="ml-1 h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-           
-            <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt- py-2">
-              <button
-                onClick={() => handleSort("asc")}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-              >
-                Lowest to Highest
-              </button>
-              <button
-                onClick={() => handleSort("desc")}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-              >
-                Highest to Lowest
-              </button>
-            </div>
-          </div>
-
-       
-          <div className="relative group">
-            <button
-              className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Beauty and Personal Care
-              <svg
-                className="ml-1 h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-            
-            <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
-              <Link
-                href="/?category=beauty"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "beauty"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Beauty
-              </Link>
-              <Link
-                href="/?category=fragrances"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "fragrances"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Fragrances
-              </Link>
-              <Link
-                href="/?category=skin-care"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "skin-care"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Skin-care
-              </Link>
-            </div>
-          </div>
-
+       <div className="relative group">
+         <button
+           className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-10 text-sm font-medium focus:outline-none"
+           aria-haspopup="true"
+           aria-expanded="false"
+         >
+           Sort By
+           <svg
+             className="ml-1 h-4 w-4"
+             xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 20 20"
+             fill="currentColor"
+             aria-hidden="true"
+           >
+             <path
+               fillRule="evenodd"
+               d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+               clipRule="evenodd"
+             />
+           </svg>
+         </button>
         
-          <div className="relative group">
-            <button
-              className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Fashion and Accessories
-              <svg
-                className="ml-1 h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+         <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt- py-2">
+           <button
+             onClick={() => handleSort("asc")}
+             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+           >
+             Lowest to Highest
+           </button>
+           <button
+             onClick={() => handleSort("desc")}
+             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+           >
+             Highest to Lowest
+           </button>
+         </div>
+       </div>
+
+    
+       <div className="relative group">
+         <button
+           className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
+           aria-haspopup="true"
+           aria-expanded="false"
+         >
+           Beauty and Personal Care
+           <svg
+             className="ml-1 h-4 w-4"
+             xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 20 20"
+             fill="currentColor"
+             aria-hidden="true"
+           >
+             <path
+               fillRule="evenodd"
+               d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+               clipRule="evenodd"
+             />
+           </svg>
+         </button>
+         
+         <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
+           <Link
+             href="/?category=beauty"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "beauty"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Beauty
+           </Link>
+           <Link
+             href="/?category=fragrances"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "fragrances"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Fragrances
+           </Link>
+           <Link
+             href="/?category=skin-care"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "skin-care"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Skin-care
+           </Link>
+         </div>
+       </div>
+
+     
+       <div className="relative group">
+         <button
+           className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
+           aria-haspopup="true"
+           aria-expanded="false"
+         >
+           Fashion and Accessories
+           <svg
+             className="ml-1 h-4 w-4"
+             xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 20 20"
+             fill="currentColor"
+             aria-hidden="true"
+           >
+             <path
+               fillRule="evenodd"
+               d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+               clipRule="evenodd"
+             />
+           </svg>
+         </button>
+   
+         <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
+           <Link
+             href="/?category=mens-shirts"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "mens-shirts"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Men's Shirts
+           </Link>
+           <Link
+             href="/?category=mens-shoes"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "mens-shoes"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Men's Shoes
+           </Link>
+           <Link
+             href="/?category=mens-watches"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "mens-watches"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Men's Watches
+           </Link>
+           <Link
+             href="/?category=sunglasses"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "sunglasses"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Sunglasses
+           </Link>
+           <Link
+             href="/?category=tops"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "tops"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Tops
+           </Link>
+           <Link
+             href="/?category=womens-bags"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "womens-bags"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Women's Bags
+           </Link>
+           <Link
+             href="/?category=womens-dresses"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "womens-dresses"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Women's Dresses
+           </Link>
+           <Link
+             href="/?category=womens-jewellery"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "womens-jewellery"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Women's Jewellery
+           </Link>
+           <Link
+             href="/?category=womens-shoes"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "womens-shoes"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Women's Shoes
+           </Link>
+           <Link
+             href="/?category=womens-watches"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "womens-watches"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Women's Watches
+           </Link>
+         </div>
+       </div>
+
+     
+       <div className="relative group">
+         <button
+           className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
+           aria-haspopup="true"
+           aria-expanded="false"
+         >
+           Electronics
+           <svg
+             className="ml-1 h-4 w-4"
+             xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 20 20"
+             fill="currentColor"
+             aria-hidden="true"
+           >
+             <path
+               fillRule="evenodd"
+               d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+               clipRule="evenodd"
+             />
+           </svg>
+         </button>
+        
+         <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
+           <Link
+             href="/?category=laptops"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "laptops"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Laptops
+           </Link>
+           <Link
+             href="/?category=mobile-accessories"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "mobile-accessories"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Mobile Accessories
+           </Link>
+           <Link
+             href="/?category=smartphones"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "smartphones"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Smartphones
+           </Link>
+           <Link
+             href="/?category=tablets"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "tablets"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Tablets
+           </Link>
+         </div>
+       </div>
+
+    
+       <div className="relative group">
+         <button
+           className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
+           aria-haspopup="true"
+           aria-expanded="false"
+         >
+           Home and Living
+           <svg
+             className="ml-1 h-4 w-4"
+             xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 20 20"
+             fill="currentColor"
+             aria-hidden="true"
+           >
+             <path
+               fillRule="evenodd"
+               d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+               clipRule="evenodd"
+             />
+           </svg>
+         </button>
+       
+         <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
+           <Link
+             href="/?category=furniture"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "furniture"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Furniture
+           </Link>
+           <Link
+             href="/?category=home-decoration"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "home-decoration"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Home Decoration
+           </Link>
+           <Link
+             href="/?category=kitchen-accessories"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "kitchen-accessories"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Kitchen Accessories
+           </Link>
+         </div>
+       </div>
+
       
-            <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
-              <Link
-                href="/?category=mens-shirts"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "mens-shirts"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Men's Shirts
-              </Link>
-              <Link
-                href="/?category=mens-shoes"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "mens-shoes"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Men's Shoes
-              </Link>
-              <Link
-                href="/?category=mens-watches"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "mens-watches"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Men's Watches
-              </Link>
-              <Link
-                href="/?category=sunglasses"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "sunglasses"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Sunglasses
-              </Link>
-              <Link
-                href="/?category=tops"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "tops"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Tops
-              </Link>
-              <Link
-                href="/?category=womens-bags"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "womens-bags"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Women's Bags
-              </Link>
-              <Link
-                href="/?category=womens-dresses"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "womens-dresses"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Women's Dresses
-              </Link>
-              <Link
-                href="/?category=womens-jewellery"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "womens-jewellery"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Women's Jewellery
-              </Link>
-              <Link
-                href="/?category=womens-shoes"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "womens-shoes"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Women's Shoes
-              </Link>
-              <Link
-                href="/?category=womens-watches"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "womens-watches"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Women's Watches
-              </Link>
-            </div>
-          </div>
-
+       <div className="relative group">
+         <button
+           className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
+           aria-haspopup="true"
+           aria-expanded="false"
+         >
+           Sports and Outdoor
+           <svg
+             className="ml-1 h-4 w-4"
+             xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 20 20"
+             fill="currentColor"
+             aria-hidden="true"
+           >
+             <path
+               fillRule="evenodd"
+               d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+               clipRule="evenodd"
+             />
+           </svg>
+         </button>
         
-          <div className="relative group">
-            <button
-              className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Electronics
-              <svg
-                className="ml-1 h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-           
-            <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
-              <Link
-                href="/?category=laptops"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "laptops"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Laptops
-              </Link>
-              <Link
-                href="/?category=mobile-accessories"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "mobile-accessories"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Mobile Accessories
-              </Link>
-              <Link
-                href="/?category=smartphones"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "smartphones"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Smartphones
-              </Link>
-              <Link
-                href="/?category=tablets"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "tablets"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Tablets
-              </Link>
-            </div>
-          </div>
+         <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
+           <Link
+             href="/?category=motorcycle"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "motorcycle"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Motorcycle
+           </Link>
+           <Link
+             href="/?category=sports-accessories"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "sports-accessories"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Sports Accessories
+           </Link>
+           <Link
+             href="/?category=vehicle"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "vehicle"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Vehicle
+           </Link>
+         </div>
+       </div>
 
-       
-          <div className="relative group">
-            <button
-              className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Home and Living
-              <svg
-                className="ml-1 h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          
-            <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
-              <Link
-                href="/?category=furniture"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "furniture"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Furniture
-              </Link>
-              <Link
-                href="/?category=home-decoration"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "home-decoration"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Home Decoration
-              </Link>
-              <Link
-                href="/?category=kitchen-accessories"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "kitchen-accessories"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Kitchen Accessories
-              </Link>
-            </div>
-          </div>
-
+      
+       <div className="relative group">
+         <button
+           className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
+           aria-haspopup="true"
+           aria-expanded="false"
+         >
+           Groceries
+           <svg
+             className="ml-1 h-4 w-4"
+             xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 20 20"
+             fill="currentColor"
+             aria-hidden="true"
+           >
+             <path
+               fillRule="evenodd"
+               d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+               clipRule="evenodd"
+             />
+           </svg>
+         </button>
          
-          <div className="relative group">
-            <button
-              className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Sports and Outdoor
-              <svg
-                className="ml-1 h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+         <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
+           <Link
+             href="/?category=groceries"
+             className={`block px-4 py-2 text-sm ${
+               currentCategory === "groceries"
+                 ? "bg-gray-200 text-gray-900"
+                 : "text-gray-700 hover:bg-gray-200"
+             }`}
+           >
+             Groceries
+           </Link>
            
-            <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
-              <Link
-                href="/?category=motorcycle"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "motorcycle"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Motorcycle
-              </Link>
-              <Link
-                href="/?category=sports-accessories"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "sports-accessories"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Sports Accessories
-              </Link>
-              <Link
-                href="/?category=vehicle"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "vehicle"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Vehicle
-              </Link>
-            </div>
-          </div>
-
-         
-          <div className="relative group">
-            <button
-              className="bg-gray-900 text-white inline-flex items-center rounded-md py-2 px-3 text-sm font-medium focus:outline-none"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Groceries
-              <svg
-                className="ml-1 h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-            
-            <div className="z-50 absolute hidden group-hover:block bg-white border rounded-md shadow-lg mt-0 py-2">
-              <Link
-                href="/?category=groceries"
-                className={`block px-4 py-2 text-sm ${
-                  currentCategory === "groceries"
-                    ? "bg-gray-200 text-gray-900"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Groceries
-              </Link>
-              
-            </div>
-           
-          </div>
-          <div className="relative group">
-          <button
-                onClick={handleClear}
-                className="hidden xl:flex bg-gray-900 text-white items-center rounded-md py-2 px-3 text-sm font-medium ml-4"
-                aria-label="Clear Search and Sort"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5 mr-2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 6h18M9 6v12m6-12v12M10.5 6V4.5a1.5 1.5 0 013 0V6m6.75 0h-13.5M18 6v12a2.25 2.25 0 01-2.25 2.25H8.25A2.25 2.25 0 016 18V6h12z"
-                  />
-                </svg>
-                Clear
-              </button>
-          </div>
-        </div>
+         </div>
+        
+       </div>
+       <div className="relative group">
+       <button
+             onClick={handleClear}
+             className="hidden xl:flex bg-gray-900 text-white items-center rounded-md py-2 px-3 text-sm font-medium ml-4"
+             aria-label="Clear Search and Sort"
+           >
+             <svg
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               strokeWidth="1.5"
+               stroke="currentColor"
+               className="w-5 h-5 mr-2"
+             >
+               <path
+                 strokeLinecap="round"
+                 strokeLinejoin="round"
+                 d="M3 6h18M9 6v12m6-12v12M10.5 6V4.5a1.5 1.5 0 013 0V6m6.75 0h-13.5M18 6v12a2.25 2.25 0 01-2.25 2.25H8.25A2.25 2.25 0 016 18V6h12z"
+               />
+             </svg>
+             Clear
+           </button>
+       </div>
+     </div>
+   
       </nav>
     </div>
   );

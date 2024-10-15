@@ -2,6 +2,20 @@ import { db } from '../../lib/firebase';
 import { collection, getDocs, query, where, orderBy, limit, startAfter } from 'firebase/firestore';
 import Fuse from 'fuse.js';
 
+/**
+ * API endpoint to handle product retrieval with pagination, filtering, and search.
+ * 
+ * @param {object} req - The HTTP request object.
+ * @param {object} req.query - The query parameters from the HTTP request.
+ * @param {number} [req.query.page=1] - The page number for pagination.
+ * @param {number} [req.query.pageSize=20] - The number of items per page for pagination.
+ * @param {string} [req.query.category] - The category to filter products by.
+ * @param {string} [req.query.search] - The search term to filter products by.
+ * @param {string} [req.query.sort] - The sort order, either 'asc' or 'desc' for sorting by price.
+ * @param {object} res - The HTTP response object.
+ * 
+ * @returns {object} JSON response with the list of filtered, sorted, and paginated products.
+ */
 export default async function handler(req, res) {
   const { page = 1, pageSize = 20, category, search, sort } = req.query;
   const productCollection = collection(db, 'products');
@@ -43,7 +57,15 @@ export default async function handler(req, res) {
   res.status(200).json(products);
 }
 
-// Helper to get the last visible product of the previous page
+/**
+ * Helper function to get the last visible product of the previous page for pagination.
+ * 
+ * @param {number} page - The page number for pagination.
+ * @param {number} pageSize - The number of items per page for pagination.
+ * @param {string} [sort] - The sort order, either 'asc' or 'desc' for sorting by price.
+ * 
+ * @returns {object} The last visible product document from the Firestore collection.
+ */
 async function getLastVisibleProduct(page, pageSize, sort) {
   const productCollection = collection(db, 'products');
   let q = query(productCollection);
