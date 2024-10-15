@@ -6,7 +6,7 @@ import { doc, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
 initFirebaseAdmin();
 
 /**
- * API endpoint to handle adding reviews to a product.
+ * API endpoint to handle adding reviews to a products.
  * 
  * @param {object} req - The HTTP request object.
  * @param {string} req.method - The HTTP method used for the request.
