@@ -1,8 +1,10 @@
-"use client";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import ProductDetailSkeleton from "../../../../components/productDetailSkeleton";
-import Error from "../../../../components/404";
+"use client"; // Ensure this is at the very top for client-side rendering
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+
+import ProductDetailSkeleton from '../../../components/productDetailSkeleton'; // Adjust path if necessary
+import Error from '../../../components/404'; // Adjust path if necessary
 
 /**
  * ProductDetail Component
@@ -10,42 +12,41 @@ import Error from "../../../../components/404";
  * @returns {JSX.Element} The rendered component.
  */
 const ProductDetail = () => {
-  const { id } = useParams(); // Retrieve product ID from the URL.
-  const router = useRouter(); // Router instance for navigating.
-  const [product, setProduct] = useState(null); // State to store product details.
-  const [loading, setLoading] = useState(true); // State to manage loading state.
-  const [error, setError] = useState(null); // State to manage errors.
-  const [activeTab, setActiveTab] = useState("description"); // State to track the active tab (description/reviews).
-  const [sortType, setSortType] = useState("date"); // State to manage the sorting type for reviews.
+  const router = useRouter();
+  const { id } = router.query;
 
-  /**
-   * Fetches the product data from the API based on the product ID.
-   * @param {string} id - The product ID.
-   */
+  // Normalize the product ID
+  const normalizedId = id ? id.toString().padStart(3, '0') : null; // Pad the ID to ensure it matches the Firestore format
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('description'); // Track active tab (description/reviews)
+  const [sortType, setSortType] = useState('date'); // State to manage the sorting type for reviews
+
   useEffect(() => {
-    const fetchProduct = async (id) => {
-      try {
-        const res = await fetch(`https://next-ecommerce-api.vercel.app/products/${id}`);
-        if (!res.ok) {
-          throw new Error(`Failed to fetch product. Status: ${res.status}`);
+    if (normalizedId) {
+      const fetchProduct = async () => {
+        try {
+          const response = await fetch(`/api/products/${normalizedId}`);
+          if (!response.ok) {
+            throw new Error('Product not found');
+          }
+          const data = await response.json();
+          setProduct(data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
         }
-        const data = await res.json();
-        setProduct(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    if (id) {
-      fetchProduct(id);
+      fetchProduct();
     }
-  }, [id]);
+  }, [normalizedId]);
 
-  if (loading) return <ProductDetailSkeleton />; // Show loading skeleton while data is loading.
-  if (error) return <Error />; // Show error component in case of an error.
-  if (!product) return <p>No product found</p>; // Display message if no product is found.
+  if (loading) return <ProductDetailSkeleton />; // Show loading skeleton while loading
+  if (error) return <Error />; // Show error component in case of an error
+  if (!product) return <p className="text-center mt-8">No product found</p>; // Display message if no product is found
 
   /**
    * Sorts the reviews array based on the selected type (either "date" or "rating").
@@ -54,18 +55,19 @@ const ProductDetail = () => {
    * @returns {Array} Sorted reviews.
    */
   const sortReviews = (reviews, type) => {
-    return reviews.sort((a, b) => {
-      if (type === "date") {
+    return [...reviews].sort((a, b) => { // Create a copy to avoid mutating state
+      if (type === 'date') {
         return new Date(b.date) - new Date(a.date);
-      } else if (type === "rating") {
+      } else if (type === 'rating') {
         return b.rating - a.rating;
       }
+      return 0;
     });
   };
 
   return (
     <div className="font-sans p-8 tracking-wide max-lg:max-w-2xl mx-auto">
-     
+      {/* Back Button */}
       <button
         onClick={() => router.back()}
         className="flex items-center text-gray-600 font-bold mb-4 hover:text-indigo-600 transition-all"
@@ -83,18 +85,19 @@ const ProductDetail = () => {
         Back
       </button>
 
+      {/* Main Content */}
       <div className="grid items-start grid-cols-1 lg:grid-cols-2 gap-10">
-     
+        {/* Image Section */}
         <div className="space-y-4 text-center lg:sticky top-8">
           <div className="bg-gray-100 p-4 flex items-center sm:h-[380px] rounded-lg">
             <img
-              src={product.images[0]}
+              src={product.images && product.images.length > 0 ? product.images[0] : product.thumbnail}
               alt={product.title}
               className="w-full max-h-full object-contain object-top"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {product.images.slice(1).map((image, index) => (
+            {product.images && product.images.slice(1).map((image, index) => (
               <div
                 key={index}
                 className="bg-gray-100 p-4 flex items-center rounded-lg sm:h-[182px]"
@@ -109,20 +112,19 @@ const ProductDetail = () => {
           </div>
         </div>
 
-       
+        {/* Product Information Section */}
         <div className="max-w-xl">
+          {/* Product Title and Category */}
           <h2 className="text-2xl font-extrabold text-gray-800">{product.title}</h2>
           <p className="text-sm text-gray-600 mt-2">{product.category}</p>
           <h3 className="text-gray-800 text-4xl font-bold mt-4">${product.price}</h3>
 
-         
+          {/* Rating Stars */}
           <div className="flex space-x-1 mt-4">
             {[...Array(5)].map((_, index) => (
               <svg
                 key={index}
-                className={`w-5 ${
-                  index < Math.round(product.rating) ? "fill-yellow-400" : "fill-[#CED5D8]"
-                }`}
+                className={`w-5 ${index < Math.round(product.rating) ? 'fill-yellow-400' : 'fill-[#CED5D8]'}`}
                 viewBox="0 0 14 13"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -132,34 +134,34 @@ const ProductDetail = () => {
             ))}
           </div>
 
+          {/* Tabs for Description and Reviews */}
           <div className="mt-8">
-          
             <ul className="flex border-b">
               <li
                 className={`${
-                  activeTab === "description"
-                    ? "text-gray-800 font-bold bg-gray-100 py-3 px-8 border-b-2 border-indigo-600"
-                    : "text-gray-600 font-bold py-3 px-8"
+                  activeTab === 'description'
+                    ? 'text-gray-800 font-bold bg-gray-100 py-3 px-8 border-b-2 border-indigo-600'
+                    : 'text-gray-600 font-bold py-3 px-8'
                 } cursor-pointer transition-all`}
-                onClick={() => setActiveTab("description")}
+                onClick={() => setActiveTab('description')}
               >
                 Description
               </li>
               <li
                 className={`${
-                  activeTab === "reviews"
-                    ? "text-gray-800 font-bold bg-gray-100 py-3 px-8 border-b-2 border-indigo-600"
-                    : "text-gray-600 font-bold py-3 px-8"
+                  activeTab === 'reviews'
+                    ? 'text-gray-800 font-bold bg-gray-100 py-3 px-8 border-b-2 border-indigo-600'
+                    : 'text-gray-600 font-bold py-3 px-8'
                 } cursor-pointer transition-all`}
-                onClick={() => setActiveTab("reviews")}
+                onClick={() => setActiveTab('reviews')}
               >
                 Reviews
               </li>
             </ul>
 
-           
+            {/* Tab Content */}
             <div className="mt-8">
-              {activeTab === "description" ? (
+              {activeTab === 'description' ? (
                 <>
                   <h3 className="text-lg font-bold text-gray-800">Product Description</h3>
                   <p className="text-sm text-gray-600 mt-4">{product.description}</p>
@@ -167,7 +169,7 @@ const ProductDetail = () => {
                     <li>Brand: {product.brand}</li>
                     <li>{product.stock} in stock</li>
                     <li>Availability Status: {product.availabilityStatus}</li>
-                    <li>Tags: {product.tags.join(", ")}</li>
+                    <li>Tags: {product.tags && product.tags.join(', ')}</li>
                     <li>Return Policy: {product.returnPolicy}</li>
                   </ul>
                 </>
@@ -175,7 +177,7 @@ const ProductDetail = () => {
                 <>
                   <h3 className="text-lg font-bold text-gray-800">Customer Reviews</h3>
 
-                 
+                  {/* Sorting Buttons */}
                   <div className="flex space-x-4 mb-4">
                     <button
                       className={`py-2 px-4 text-sm font-semibold rounded-lg ${
@@ -195,7 +197,7 @@ const ProductDetail = () => {
                     </button>
                   </div>
 
-                
+                  {/* Reviews List */}
                   {product.reviews && product.reviews.length > 0 ? (
                     <ul className="space-y-3 mt-4">
                       {sortReviews(product.reviews, sortType).map((review, index) => (
@@ -216,17 +218,17 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          
+          {/* Action Buttons */}
           <div className="flex flex-wrap gap-4 mt-8">
             <button
               type="button"
-              className="min-w-[200px] px-4 py-3 bg-indigo-600 hover:bg-indigo-600 text-white text-sm font-semibold rounded-lg"
+              className="min-w-[200px] px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors"
             >
               Buy now
             </button>
             <button
               type="button"
-              className="min-w-[200px] px-4 py-3 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200"
+              className="min-w-[200px] px-4 py-3 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
             >
               Add to cart
             </button>

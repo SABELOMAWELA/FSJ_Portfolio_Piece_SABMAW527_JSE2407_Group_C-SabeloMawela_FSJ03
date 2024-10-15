@@ -49,7 +49,7 @@ export default function Cards() {
   }, [category, searchQuery, sortOrder, currentPage]);
 
   /**
-   * Fetches products from the API based on the current filters and pagination.
+   * Fetches products from the Firebase API based on the current filters and pagination.
    * Sets the products state and handles any errors.
    */
   useEffect(() => {
@@ -58,8 +58,7 @@ export default function Cards() {
       setError("");
 
       try {
-        const skip = (currentPage - 1) * itemsPerPage;
-        let url = `https://next-ecommerce-api.vercel.app/products?skip=${skip}`;
+        let url = `/api/products?page=${currentPage}&pageSize=${itemsPerPage}`;
         if (category) {
           url += `&category=${category}`;
         }
@@ -67,7 +66,7 @@ export default function Cards() {
           url += `&search=${searchQuery}`;
         }
         if (sortOrder) {
-          url += `&sortBy=price&order=${sortOrder}`;
+          url += `&sort=${sortOrder}`;
         }
 
         const res = await fetch(url);
@@ -123,7 +122,6 @@ export default function Cards() {
     setCurrentPage(newPage);
   };
 
-
   if (loading) {
     return (
       <section className="py-4">
@@ -141,7 +139,6 @@ export default function Cards() {
     return <Error />;
   }
 
-  
   if (!filteredProducts.length) {
     return <Error />;
   }
@@ -215,7 +212,6 @@ const ImageSelector = ({ images, productId }) => {
     setMainImage(image);
   };
 
-  
   const displayedImages = images.slice(0, 4);
 
   return (
